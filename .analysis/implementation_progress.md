@@ -63,7 +63,7 @@
 - [x] ✅ 验证状态转换逻辑
 
 ### 2.4 示例代码和文档
-- [x] ✅ 创建基础示例（`examples/basic/circuitbreaker`）
+- [x] ✅ 创建基础示例（`src/test/java/com/joker/resilience4j/examples/basic/circuitbreaker`）
 - [x] ✅ 添加详细注释说明
 - [x] ✅ 编写配置详解文档（`docs/circuitbreaker/02-configuration.md`）
 
@@ -172,6 +172,7 @@
 - ✅ 阶段一完成
 - ✅ 阶段二完成（CircuitBreaker 基础实现）
 - ✅ 新增 CircuitBreaker 文档、示例与单元测试
+- ✅ 更新约束：UT 覆盖率要求 100%
 
 ---
 

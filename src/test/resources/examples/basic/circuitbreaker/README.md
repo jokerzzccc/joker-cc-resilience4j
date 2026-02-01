@@ -11,3 +11,19 @@ GET /api/circuit-breaker/state
 ```
 
 当失败或慢调用达到阈值后，状态会从 CLOSED 进入 OPEN。
+
+## 不同配置示例
+
+快速失败（适合不稳定依赖）：
+```
+failureRateThreshold: 30%
+slidingWindowSize: 10
+waitDurationInOpenState: 3s
+```
+
+慢调用检测（适合延迟敏感场景）：
+```
+slowCallRateThreshold: 50%
+slowCallDurationThreshold: 500ms
+slidingWindowSize: 20
+```

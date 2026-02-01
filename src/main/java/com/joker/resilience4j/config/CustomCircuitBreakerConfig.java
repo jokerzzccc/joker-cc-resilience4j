@@ -1,17 +1,19 @@
 package com.joker.resilience4j.config;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
-import java.time.Duration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
+
 @Configuration
-public class CircuitBreakerConfig {
+public class CustomCircuitBreakerConfig {
 
     @Bean
-    public io.github.resilience4j.circuitbreaker.CircuitBreakerConfig circuitBreakerConfig() {
-        return io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.custom()
+    public CircuitBreakerConfig circuitBreakerConfig() {
+        return CircuitBreakerConfig.custom()
                 .failureRateThreshold(50.0f)
                 .slowCallRateThreshold(50.0f)
                 .slowCallDurationThreshold(Duration.ofSeconds(2))
@@ -25,7 +27,7 @@ public class CircuitBreakerConfig {
 
     @Bean
     public CircuitBreakerRegistry circuitBreakerRegistry(
-            io.github.resilience4j.circuitbreaker.CircuitBreakerConfig circuitBreakerConfig) {
+            CircuitBreakerConfig circuitBreakerConfig) {
         return CircuitBreakerRegistry.of(circuitBreakerConfig);
     }
 
@@ -33,4 +35,5 @@ public class CircuitBreakerConfig {
     public CircuitBreaker circuitBreaker(CircuitBreakerRegistry circuitBreakerRegistry) {
         return circuitBreakerRegistry.circuitBreaker("externalApi");
     }
+
 }

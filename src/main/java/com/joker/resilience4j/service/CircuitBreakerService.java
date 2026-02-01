@@ -4,6 +4,7 @@ import com.joker.resilience4j.model.ApiResponse;
 import com.joker.resilience4j.model.CircuitBreakerStatus;
 import com.joker.resilience4j.model.ErrorResponse;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.function.Supplier;
@@ -21,17 +22,23 @@ public class CircuitBreakerService {
     private final CircuitBreaker circuitBreaker;
     private final ExternalApiService externalApiService;
 
+    private record CallPlan(Supplier<String> supplier, boolean blocking) {
+    }
+
     public CircuitBreakerService(CircuitBreaker circuitBreaker, ExternalApiService externalApiService) {
         this.circuitBreaker = circuitBreaker;
         this.externalApiService = externalApiService;
     }
 
     public Mono<ApiResponse<String>> callExternal(String mode, long delayMs) {
-        Supplier<String> supplier = selectSupplier(mode, delayMs);
-        Supplier<String> protectedSupplier = circuitBreaker.decorateSupplier(supplier);
+        CallPlan plan = selectSupplier(mode, delayMs);
+        Mono<String> source = Mono.fromCallable(plan.supplier()::get);
+        if (plan.blocking()) {
+            source = source.subscribeOn(Schedulers.boundedElastic());
+        }
 
-        return Mono.fromSupplier(protectedSupplier)
-                .subscribeOn(Schedulers.boundedElastic())
+        return source
+                .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
                 .map(ApiResponse::success)
                 .onErrorResume(throwable -> Mono.just(ApiResponse.failure(
                         ErrorResponse.from(throwable, circuitBreaker.getState().name())
@@ -53,12 +60,15 @@ public class CircuitBreakerService {
         return ApiResponse.success(status);
     }
 
-    private Supplier<String> selectSupplier(String mode, long delayMs) {
+    private CallPlan selectSupplier(String mode, long delayMs) {
         String normalized = mode == null ? MODE_SUCCESS : mode.toLowerCase(Locale.ROOT).trim();
         return switch (normalized) {
-            case MODE_FAILURE -> externalApiService::callFailure;
-            case MODE_SLOW -> () -> externalApiService.callSlow(Duration.ofMillis(Math.max(0, delayMs)));
-            default -> externalApiService::callSuccess;
+            case MODE_FAILURE -> new CallPlan(externalApiService::callFailure, false);
+            case MODE_SLOW -> new CallPlan(
+                    () -> externalApiService.callSlow(Duration.ofMillis(Math.max(0, delayMs))),
+                    true
+            );
+            default -> new CallPlan(externalApiService::callSuccess, false);
         };
     }
 }

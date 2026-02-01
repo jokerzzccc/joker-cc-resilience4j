@@ -2,6 +2,7 @@ package com.joker.resilience4j;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * Resilience4j Reactor Learning Application
@@ -20,7 +21,21 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Application {
 
+    private static ConfigurableApplicationContext context;
+
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        run(args);
+    }
+
+    static ConfigurableApplicationContext run(String... args) {
+        context = SpringApplication.run(Application.class, args);
+        return context;
+    }
+
+    static void stop() {
+        if (context != null) {
+            context.close();
+            context = null;
+        }
     }
 }
