@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn clean compile:*)",
+      "Bash(java:*)",
+      "Bash(javac:*)",
+      "Bash(where:*)",
+      "Bash(dir:*)",
+      "Bash(\"D:\\\\Program Files\\\\Java\\\\jdk-21.0.2\\\\bin\\\\java.exe\" -version)",
+      "Bash(set:*)",
+      "Bash(set PATH=%JAVA_HOME%bin)",
+      "Bash(%PATH%)",
+      "Bash(export:*)",
+      "Bash(export PATH=\"$JAVA_HOME/bin:$PATH\")",
+      "Bash(mvn clean install:*)",
+      "Bash(git init:*)",
+      "Bash(git config:*)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)"
+    ]
+  }
+}
