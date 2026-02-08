@@ -33,10 +33,20 @@ class ExternalApiServiceTest {
     }
 
     @Test
+    void shouldReturnSlowResponseWithPositiveDelay() {
+        assertThat(service.callSlow(Duration.ofMillis(1))).isEqualTo("external-api-slow");
+    }
+
+    @Test
+    void shouldReturnSlowResponseWhenDelayIsNegative() {
+        assertThat(service.callSlow(Duration.ofMillis(-1))).isEqualTo("external-api-slow");
+    }
+
+    @Test
     void shouldHandleInterruptedSleep() {
         Thread.currentThread().interrupt();
         try {
-            assertThatThrownBy(() -> service.callSlow(Duration.ofMillis(1)))
+            assertThatThrownBy(() -> service.callSlow(Duration.ofMillis(50)))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessage("External API interrupted");
         } finally {

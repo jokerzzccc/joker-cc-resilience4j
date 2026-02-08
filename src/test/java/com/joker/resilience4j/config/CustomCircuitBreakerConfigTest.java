@@ -29,9 +29,11 @@ class CustomCircuitBreakerConfigTest {
         CustomCircuitBreakerConfig config = new CustomCircuitBreakerConfig();
         io.github.resilience4j.circuitbreaker.CircuitBreakerConfig cbConfig = config.circuitBreakerConfig();
         CircuitBreakerRegistry registry = config.circuitBreakerRegistry(cbConfig);
-        CircuitBreaker circuitBreaker = config.circuitBreaker(registry);
+        CircuitBreakerFactory factory = config.circuitBreakerFactory(cbConfig);
+        CircuitBreaker circuitBreaker = config.circuitBreaker(factory);
 
         assertThat(circuitBreaker.getName()).isEqualTo("externalApi");
-        assertThat(registry.getAllCircuitBreakers()).isNotEmpty();
+        assertThat(registry).isNotNull();
+        assertThat(factory.get("externalApi")).isPresent();
     }
 }

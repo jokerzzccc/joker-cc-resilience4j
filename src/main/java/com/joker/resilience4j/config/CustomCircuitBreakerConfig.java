@@ -32,8 +32,12 @@ public class CustomCircuitBreakerConfig {
     }
 
     @Bean
-    public CircuitBreaker circuitBreaker(CircuitBreakerRegistry circuitBreakerRegistry) {
-        return circuitBreakerRegistry.circuitBreaker("externalApi");
+    public CircuitBreakerFactory circuitBreakerFactory(CircuitBreakerConfig circuitBreakerConfig) {
+        return new CircuitBreakerFactory(circuitBreakerConfig);
     }
 
+    @Bean
+    public CircuitBreaker circuitBreaker(CircuitBreakerFactory circuitBreakerFactory) {
+        return circuitBreakerFactory.create("externalApi", CircuitBreakerFactory.ConfigTemplate.HYBRID);
+    }
 }
