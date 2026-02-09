@@ -13,7 +13,7 @@ class ErrorResponseTest {
 
         assertThat(response.message()).isEqualTo("boom");
         assertThat(response.exception()).isEqualTo("RuntimeException");
-        assertThat(response.circuitBreakerState()).isEqualTo("CLOSED");
+        assertThat(response.componentState()).isEqualTo("CLOSED");
     }
 
     @Test
@@ -23,6 +23,6 @@ class ErrorResponseTest {
 
         assertThat(response.message()).isEqualTo("Unexpected error");
         assertThat(response.exception()).isEqualTo("RuntimeException");
-        assertThat(response.circuitBreakerState()).isEqualTo("OPEN");
+        assertThat(response.componentState()).isEqualTo("OPEN");
     }
 }

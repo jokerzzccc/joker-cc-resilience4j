@@ -115,28 +115,28 @@
 ## 阶段四：RateLimiter 基础实现（预计完成时间：第6-7天）
 
 ### 4.1 理论学习
-- [ ] 编写 RateLimiter 基础概念文档（`docs/ratelimiter/01-basics.md`）
-- [ ] 理解限流算法原理
-- [ ] 学习配置参数含义
+- [x] 编写 RateLimiter 基础概念文档（`docs/ratelimiter/01-basics.md`）
+- [x] 理解限流算法原理
+- [x] 学习配置参数含义
 
 ### 4.2 基础实现
-- [ ] 创建 RateLimiterConfig 配置类
-- [ ] 创建 RateLimiterService 实现限流逻辑
-- [ ] 创建 RateLimiterController 提供测试接口
-- [ ] 实现不同限流策略
+- [x] 创建 RateLimiterConfig 配置类
+- [x] 创建 RateLimiterService 实现限流逻辑
+- [x] 创建 RateLimiterController 提供测试接口
+- [x] 实现不同限流策略
 
 ### 4.3 功能验证
-- [ ] 编写单元测试
-- [ ] 测试正常限流场景
-- [ ] 测试超限拒绝场景
-- [ ] 测试限流恢复场景
-- [ ] 验证限流准确性
+- [x] 编写单元测试
+- [x] 测试正常限流场景
+- [x] 测试超限拒绝场景
+- [x] 测试限流恢复场景
+- [x] 验证限流准确性
 
 ### 4.4 示例代码和文档
-- [ ] 创建基础示例（src/test/java/com/joker/resilience4j/examples/basic/ratelimiter）
-- [ ] 创建不同限流策略示例
-- [ ] 添加详细注释说明
-- [ ] 编写配置详解文档（`docs/ratelimiter/02-configuration.md`）
+- [x] 创建基础示例（src/test/java/com/joker/resilience4j/examples/basic/ratelimiter）
+- [x] 创建不同限流策略示例
+- [x] 添加详细注释说明
+- [x] 编写配置详解文档（`docs/ratelimiter/02-configuration.md`）
 
 **交付物：**
 - RateLimiter 基础实现代码

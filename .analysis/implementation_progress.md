@@ -5,7 +5,7 @@
 - **项目名称**: Resilience4j 2.3 学习项目
 - **开始日期**: 2026-01-31
 - **当前状态**: 进行中
-- **完成度**: 38%
+- **完成度**: 50%
 
 ---
 
@@ -16,7 +16,7 @@
 | 阶段一：项目基础搭建 | ✅ 已完成 | 100% | 2026-01-31 | 2026-02-01 | 基础结构已完成 |
 | 阶段二：CircuitBreaker 基础实现 | ✅ 已完成 | 100% | 2026-02-01 | 2026-02-01 | 基础 CircuitBreaker 功能完成 |
 | 阶段三：CircuitBreaker + Reactor 集成 | ✅ 已完成 | 100% | 2026-02-01 | 2026-02-01 | Reactor 集成与工厂模式 |
-| 阶段四：RateLimiter 基础实现 | ⚪ 未开始 | 0% | - | - | - |
+| 阶段四：RateLimiter 基础实现 | ✅ 已完成 | 100% | 2026-02-09 | 2026-02-09 | 基础 RateLimiter 功能完成 |
 | 阶段五：RateLimiter + Reactor 集成 | ⚪ 未开始 | 0% | - | - | - |
 | 阶段六：监控和指标体系 | ⚪ 未开始 | 0% | - | - | - |
 | 阶段七：生产环境最佳实践 | ⚪ 未开始 | 0% | - | - | - |
@@ -105,10 +105,40 @@
 
 ---
 
-## 阶段四：RateLimiter 基础实现（0% 完成）
+## 阶段四：RateLimiter 基础实现（100% 完成）
 
-### 状态：⚪ 未开始
-**计划开始时间**: 阶段三完成后
+**完成日期**: 2026-02-09
+
+### 4.1 理论学习
+- [x] ✅ 编写 RateLimiter 基础概念文档（`docs/ratelimiter/01-basics.md`）
+- [x] ✅ 理解限流算法原理（AtomicRateLimiter / SemaphoreBasedRateLimiter）
+- [x] ✅ 学习配置参数含义（limitForPeriod / limitRefreshPeriod / timeoutDuration）
+
+### 4.2 基础实现
+- [x] ✅ 创建 CustomRateLimiterConfig 配置类
+- [x] ✅ 创建 RateLimiterService 实现限流逻辑
+- [x] ✅ 创建 RateLimiterController 提供测试接口
+- [x] ✅ 创建 RateLimiterStatus 状态模型
+- [x] ✅ 重构 ErrorResponse：`circuitBreakerState` → `componentState`
+
+### 4.3 功能验证
+- [x] ✅ 编写单元测试（13 个 RateLimiter 测试）
+- [x] ✅ 测试正常限流场景
+- [x] ✅ 测试超限拒绝场景
+- [x] ✅ 测试限流恢复场景
+- [x] ✅ 测试 Fallback 降级
+- [x] ✅ 验证限流准确性
+- [x] ✅ JaCoCo 覆盖率 100%
+
+### 4.4 示例代码和文档
+- [x] ✅ 创建基础示例（`src/test/java/com/joker/resilience4j/examples/basic/ratelimiter`）
+- [x] ✅ 编写配置详解文档（`docs/ratelimiter/02-configuration.md`）
+
+**阶段总结**:
+- ✅ RateLimiter 基础配置与接口完成
+- ✅ Reactor 集成（`transformDeferred(RateLimiterOperator.of(...))`）
+- ✅ 基础文档与示例完成
+- ✅ 71 个测试全部通过，JaCoCo 100% 覆盖率
 
 ---
 
@@ -147,7 +177,7 @@
 | M1: 项目基础搭建完成 | 第1天 | 2026-02-01 | ✅ 已完成 | 100% |
 | M2: CircuitBreaker 基础实现完成 | 第3天 | 2026-02-01 | ✅ 已完成 | 100% |
 | M3: CircuitBreaker + Reactor 集成完成 | 第5天 | 2026-02-01 | ✅ 已完成 | 100% |
-| M4: RateLimiter 基础实现完成 | 第7天 | - | ⚪ 未开始 | - |
+| M4: RateLimiter 基础实现完成 | 第7天 | 2026-02-09 | ✅ 已完成 | 100% |
 | M5: RateLimiter + Reactor 集成完成 | 第9天 | - | ⚪ 未开始 | - |
 | M6: 监控体系建立完成 | 第11天 | - | ⚪ 未开始 | - |
 | M7: 生产实践完成 | 第14天 | - | ⚪ 未开始 | - |
@@ -157,21 +187,31 @@
 
 ## 当前工作重点
 
-### 阶段三已完成 ✅
-阶段三任务已完成，等待进入阶段四。
+### 阶段四已完成 ✅
+阶段四任务已完成，等待用户确认后进入阶段五。
 
-### 下一步计划（阶段四）
-1. 编写 RateLimiter 基础概念文档（`docs/ratelimiter/01-basics.md`）
-2. 实现 RateLimiterConfig / Service / Controller
-3. 编写 RateLimiter 单元测试
-4. 提供 RateLimiter 示例代码
+### 下一步计划（阶段五）
+1. 实现 RateLimiterFactory 工厂类
+2. 实现动态调整限流参数
+3. 实现事件监听和日志记录
+4. 实现限流器组合使用
+5. 编写 Reactor 集成文档（`docs/ratelimiter/03-reactor-integration.md`）
+6. 编写高级模式文档（`docs/ratelimiter/04-advanced-patterns.md`）
 
 ---
 
 ## 遇到的问题和解决方案
 
 ### 问题记录
-暂无问题记录
+
+#### 阶段四：ErrorResponse 字段命名
+- **问题**：`ErrorResponse.circuitBreakerState` 与 CircuitBreaker 耦合，RateLimiter 无法复用
+- **解决**：重命名为 `componentState`，使 ErrorResponse 成为通用错误模型
+- **影响范围**：ErrorResponse、CircuitBreakerService、相关测试文件
+
+#### 阶段四：RateLimiterRegistry.rateLimiter() 自动创建
+- **问题**：`registry.rateLimiter(name)` 在 name 不存在时会自动创建实例，导致"未找到"分支无法覆盖
+- **解决**：改用 `registry.find(name)` 返回 `Optional<RateLimiter>`，正确处理不存在的情况
 
 ---
 
@@ -183,6 +223,11 @@
 ### 2026-02-01
 - 完成 CircuitBreaker 基础实现与文档
 - 完成 CircuitBreaker + Reactor 集成与工厂模式
+
+### 2026-02-09
+- 完成 RateLimiter 基础实现与 Reactor 集成
+- 重构 ErrorResponse 为通用模型
+- RateLimiterRegistry.find() vs rateLimiter() 的区别
 
 ---
 
@@ -199,8 +244,14 @@
 - ✅ 更新约束：UT 覆盖率要求 100%
 - ✅ 阶段三完成（CircuitBreaker + Reactor 集成）
 
+### 2026-02-09
+- ✅ 阶段四完成（RateLimiter 基础实现）
+- ✅ 重构 ErrorResponse：`circuitBreakerState` → `componentState`
+- ✅ 新增 RateLimiter 文档、示例与单元测试
+- ✅ 71 个测试全部通过，JaCoCo 100% 覆盖率
+
 ---
 
-**最后更新时间**: 2026-02-01
+**最后更新时间**: 2026-02-09
 **更新人**: Claude
-**版本**: v1.3
+**版本**: v1.4

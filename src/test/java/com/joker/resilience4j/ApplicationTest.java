@@ -16,5 +16,8 @@ class ApplicationTest {
 
         Application.main(new String[]{"--spring.main.web-application-type=none"});
         Application.stop();
+
+        // Call stop again when context is already null
+        Application.stop();
     }
 }

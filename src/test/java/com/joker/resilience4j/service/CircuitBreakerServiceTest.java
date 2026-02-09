@@ -228,7 +228,7 @@ class CircuitBreakerServiceTest {
                     assertThat(response.error()).isNotNull();
                     assertThat(response.error().message()).contains("CircuitBreaker not found");
                     assertThat(response.error().exception()).isEqualTo("NotFound");
-                    assertThat(response.error().circuitBreakerState()).isEqualTo("UNKNOWN");
+                    assertThat(response.error().componentState()).isEqualTo("UNKNOWN");
                 })
                 .verifyComplete();
     }
@@ -343,7 +343,7 @@ class CircuitBreakerServiceTest {
                 .assertNext(response -> {
                     assertThat(response.success()).isFalse();
                     assertThat(response.error()).isNotNull();
-                    assertThat(response.error().circuitBreakerState()).isEqualTo("OPEN");
+                    assertThat(response.error().componentState()).isEqualTo("OPEN");
                 })
                 .verifyComplete();
     }
@@ -392,7 +392,7 @@ class CircuitBreakerServiceTest {
                 .assertNext(response -> {
                     assertThat(response.success()).isFalse();
                     assertThat(response.error()).isNotNull();
-                    assertThat(response.error().circuitBreakerState()).isEqualTo("OPEN");
+                    assertThat(response.error().componentState()).isEqualTo("OPEN");
                 })
                 .verifyComplete();
     }
@@ -412,7 +412,7 @@ class CircuitBreakerServiceTest {
                 .assertNext(response -> {
                     assertThat(response.success()).isFalse();
                     assertThat(response.error()).isNotNull();
-                    assertThat(response.error().circuitBreakerState()).isEqualTo("OPEN");
+                    assertThat(response.error().componentState()).isEqualTo("OPEN");
                 })
                 .verifyComplete();
     }
