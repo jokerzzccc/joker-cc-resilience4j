@@ -26,7 +26,12 @@ public class CustomRateLimiterConfig {
     }
 
     @Bean
-    public RateLimiter rateLimiter(RateLimiterRegistry rateLimiterRegistry) {
-        return rateLimiterRegistry.rateLimiter("externalApi");
+    public RateLimiterFactory rateLimiterFactory(RateLimiterConfig rateLimiterConfig) {
+        return new RateLimiterFactory(rateLimiterConfig);
+    }
+
+    @Bean
+    public RateLimiter rateLimiter(RateLimiterFactory rateLimiterFactory) {
+        return rateLimiterFactory.create("externalApi", RateLimiterFactory.ConfigTemplate.BURST);
     }
 }

@@ -4,6 +4,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.joker.resilience4j.model.ApiResponse;
+import com.joker.resilience4j.model.CombinedRateLimiterStatus;
 import com.joker.resilience4j.model.RateLimiterStatus;
 import com.joker.resilience4j.service.RateLimiterService;
 import java.util.Set;
@@ -62,6 +63,49 @@ class RateLimiterControllerTest {
         RateLimiterController controller = new RateLimiterController(service);
 
         StepVerifier.create(controller.states())
+                .expectNext(expected)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnNamedResponse() {
+        RateLimiterService service = mock(RateLimiterService.class);
+        ApiResponse<String> expected = ApiResponse.success("external-api-success");
+        when(service.callExternalWithName("myLimiter", "success", 0)).thenReturn(Mono.just(expected));
+
+        RateLimiterController controller = new RateLimiterController(service);
+
+        StepVerifier.create(controller.testReactor("myLimiter", "success", 0))
+                .expectNext(expected)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnComboResponse() {
+        RateLimiterService service = mock(RateLimiterService.class);
+        ApiResponse<String> expected = ApiResponse.success("external-api-success");
+        when(service.callExternalWithCombo("primary", "secondary", "success", 0))
+                .thenReturn(Mono.just(expected));
+
+        RateLimiterController controller = new RateLimiterController(service);
+
+        StepVerifier.create(controller.testCombo("primary", "secondary", "success", 0))
+                .expectNext(expected)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnComboState() {
+        RateLimiterService service = mock(RateLimiterService.class);
+        RateLimiterStatus primary = new RateLimiterStatus("primary", 10, 0);
+        RateLimiterStatus secondary = new RateLimiterStatus("secondary", 5, 0);
+        CombinedRateLimiterStatus combined = new CombinedRateLimiterStatus(primary, secondary);
+        ApiResponse<CombinedRateLimiterStatus> expected = ApiResponse.success(combined);
+        when(service.getCombinedStatus("primary", "secondary")).thenReturn(Mono.just(expected));
+
+        RateLimiterController controller = new RateLimiterController(service);
+
+        StepVerifier.create(controller.stateCombo("primary", "secondary"))
                 .expectNext(expected)
                 .verifyComplete();
     }

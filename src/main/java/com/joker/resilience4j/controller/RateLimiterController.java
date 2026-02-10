@@ -1,6 +1,7 @@
 package com.joker.resilience4j.controller;
 
 import com.joker.resilience4j.model.ApiResponse;
+import com.joker.resilience4j.model.CombinedRateLimiterStatus;
 import com.joker.resilience4j.model.RateLimiterStatus;
 import com.joker.resilience4j.service.RateLimiterService;
 import java.util.Set;
@@ -36,11 +37,38 @@ public class RateLimiterController {
         return rateLimiterService.callExternalWithFallback(mode, delayMs);
     }
 
+    @GetMapping("/test-reactor")
+    public Mono<ApiResponse<String>> testReactor(
+            @RequestParam(defaultValue = "externalApi") String name,
+            @RequestParam(defaultValue = "success") String mode,
+            @RequestParam(defaultValue = "0") long delayMs
+    ) {
+        return rateLimiterService.callExternalWithName(name, mode, delayMs);
+    }
+
+    @GetMapping("/test-combo")
+    public Mono<ApiResponse<String>> testCombo(
+            @RequestParam(defaultValue = "externalApi") String primary,
+            @RequestParam(defaultValue = "secondaryApi") String secondary,
+            @RequestParam(defaultValue = "success") String mode,
+            @RequestParam(defaultValue = "0") long delayMs
+    ) {
+        return rateLimiterService.callExternalWithCombo(primary, secondary, mode, delayMs);
+    }
+
     @GetMapping("/state")
     public Mono<ApiResponse<RateLimiterStatus>> state(
             @RequestParam(defaultValue = "externalApi") String name
     ) {
         return rateLimiterService.getStatus(name);
+    }
+
+    @GetMapping("/state-combo")
+    public Mono<ApiResponse<CombinedRateLimiterStatus>> stateCombo(
+            @RequestParam(defaultValue = "externalApi") String primary,
+            @RequestParam(defaultValue = "secondaryApi") String secondary
+    ) {
+        return rateLimiterService.getCombinedStatus(primary, secondary);
     }
 
     @GetMapping("/states")

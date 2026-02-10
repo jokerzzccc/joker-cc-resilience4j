@@ -25,9 +25,26 @@ class CustomRateLimiterConfigTest {
         CustomRateLimiterConfig config = new CustomRateLimiterConfig();
         RateLimiterConfig rlConfig = config.rateLimiterConfig();
         RateLimiterRegistry registry = config.rateLimiterRegistry(rlConfig);
-        RateLimiter rateLimiter = config.rateLimiter(registry);
+
+        assertThat(registry).isNotNull();
+    }
+
+    @Test
+    void shouldCreateRateLimiterFactory() {
+        CustomRateLimiterConfig config = new CustomRateLimiterConfig();
+        RateLimiterConfig rlConfig = config.rateLimiterConfig();
+        RateLimiterFactory factory = config.rateLimiterFactory(rlConfig);
+
+        assertThat(factory).isNotNull();
+    }
+
+    @Test
+    void shouldCreateRateLimiterFromFactory() {
+        CustomRateLimiterConfig config = new CustomRateLimiterConfig();
+        RateLimiterConfig rlConfig = config.rateLimiterConfig();
+        RateLimiterFactory factory = config.rateLimiterFactory(rlConfig);
+        RateLimiter rateLimiter = config.rateLimiter(factory);
 
         assertThat(rateLimiter.getName()).isEqualTo("externalApi");
-        assertThat(registry).isNotNull();
     }
 }
