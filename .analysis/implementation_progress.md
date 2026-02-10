@@ -5,7 +5,7 @@
 - **项目名称**: Resilience4j 2.3 学习项目
 - **开始日期**: 2026-01-31
 - **当前状态**: 进行中
-- **完成度**: 62.5%
+- **完成度**: 75%
 
 ---
 
@@ -18,7 +18,7 @@
 | 阶段三：CircuitBreaker + Reactor 集成 | ✅ 已完成 | 100% | 2026-02-01 | 2026-02-01 | Reactor 集成与工厂模式 |
 | 阶段四：RateLimiter 基础实现 | ✅ 已完成 | 100% | 2026-02-09 | 2026-02-09 | 基础 RateLimiter 功能完成 |
 | 阶段五：RateLimiter + Reactor 集成 | ✅ 已完成 | 100% | 2026-02-09 | 2026-02-09 | Reactor 集成与工厂模式 |
-| 阶段六：监控和指标体系 | ⚪ 未开始 | 0% | - | - | - |
+| 阶段六：监控和指标体系 | ✅ 已完成 | 100% | 2026-02-10 | 2026-02-10 | Micrometer + Prometheus 集成 |
 | 阶段七：生产环境最佳实践 | ⚪ 未开始 | 0% | - | - | - |
 | 阶段八：文档完善和总结 | ⚪ 未开始 | 0% | - | - | - |
 
@@ -186,10 +186,44 @@
 
 ---
 
-## 阶段六：监控和指标体系（0% 完成）
+## 阶段六：监控和指标体系（100% 完成）
 
-### 状态：⚪ 未开始
-**计划开始时间**: 阶段五完成后
+**完成日期**: 2026-02-10
+
+### 6.1 监控配置
+- [x] ✅ 创建 MetricsConfig 配置类（`@Configuration`，6 个 Bean）
+- [x] ✅ 集成 Micrometer（`TaggedCircuitBreakerMetrics` / `TaggedRateLimiterMetrics`）
+- [x] ✅ 配置 Prometheus 指标导出（`application.yml` 已预配置）
+- [x] ✅ 配置 Actuator 端点（`/actuator/prometheus`、`/actuator/metrics`）
+
+### 6.2 指标收集
+- [x] ✅ 创建 ResilienceMetricsRegistrar（为 Factory 管理的实例注册 Gauge）
+- [x] ✅ 注册 CircuitBreaker 指标（6 个 Gauge：state、failure.rate、slow.call.rate、buffered.calls、failed.calls、not.permitted.calls）
+- [x] ✅ 注册 RateLimiter 指标（2 个 Gauge：available.permissions、waiting.threads）
+- [x] ✅ 配置自定义业务指标（Counter x2 + Timer x1）
+- [x] ✅ 创建 MetricsSnapshot 指标快照模型
+- [x] ✅ 创建 MetricsController（`/api/metrics/snapshot` 端点）
+
+### 6.3 文档
+- [x] ✅ 编写指标收集文档（`docs/monitoring/01-metrics.md`）
+- [x] ✅ 编写 Prometheus 集成文档（`docs/monitoring/02-prometheus.md`）
+- [x] ✅ 编写 Grafana 可视化文档（`docs/monitoring/03-grafana.md`）
+- [x] ✅ 编写告警配置文档（`docs/monitoring/04-alerting.md`）
+
+### 6.4 测试覆盖
+- [x] ✅ MetricsConfigTest（6 个测试）
+- [x] ✅ ResilienceMetricsRegistrarTest（7 个测试）
+- [x] ✅ MetricsControllerTest（1 个测试）
+- [x] ✅ MetricsSnapshotTest（1 个测试）
+- [x] ✅ MetricsIntegrationExample（示例代码）
+- [x] ✅ 108 个测试全部通过，JaCoCo 100% 覆盖率
+
+**阶段总结**:
+- ✅ MetricsConfig 完成：Registry 级别绑定 + 自定义 Counter/Timer + ResilienceMetricsRegistrar
+- ✅ ResilienceMetricsRegistrar 解决了 Factory 管理实例的指标盲区
+- ✅ MetricsController 提供 `/api/metrics/snapshot` 端点
+- ✅ 4 份监控文档完成（指标收集、Prometheus、Grafana、告警）
+- ✅ 108 个测试全部通过，JaCoCo LINE 和 BRANCH 100% 覆盖率
 
 ---
 
@@ -216,7 +250,7 @@
 | M3: CircuitBreaker + Reactor 集成完成 | 第5天 | 2026-02-01 | ✅ 已完成 | 100% |
 | M4: RateLimiter 基础实现完成 | 第7天 | 2026-02-09 | ✅ 已完成 | 100% |
 | M5: RateLimiter + Reactor 集成完成 | 第9天 | 2026-02-09 | ✅ 已完成 | 100% |
-| M6: 监控体系建立完成 | 第11天 | - | ⚪ 未开始 | - |
+| M6: 监控体系建立完成 | 第11天 | 2026-02-10 | ✅ 已完成 | 100% |
 | M7: 生产实践完成 | 第14天 | - | ⚪ 未开始 | - |
 | M8: 项目交付 | 第15天 | - | ⚪ 未开始 | - |
 
@@ -224,15 +258,15 @@
 
 ## 当前工作重点
 
-### 阶段五已完成 ✅
-阶段五任务已完成，等待用户确认后进入阶段六。
+### 阶段六已完成 ✅
+阶段六任务已完成，等待用户确认后进入阶段七。
 
-### 下一步计划（阶段六）
-1. 创建 MetricsConfig 配置类
-2. 集成 Micrometer
-3. 配置 Prometheus 指标导出
-4. 配置 CircuitBreaker 和 RateLimiter 指标
-5. 编写监控文档
+### 下一步计划（阶段七）
+1. 编写不同场景的配置建议
+2. 创建多环境配置示例
+3. 实现统一错误处理机制
+4. 实现多级降级策略
+5. 编写生产实践文档
 
 ---
 
@@ -253,6 +287,14 @@
 - **问题**：`ApiResponse::success` 作为方法引用在 `expectNextMatches` 中有歧义（record accessor `success()` vs static factory `success(T)`）
 - **解决**：改用 lambda `response -> response.success()` 替代方法引用
 
+#### 阶段六：Gauge lambda 未覆盖
+- **问题**：`ResilienceMetricsRegistrar` 中的 Gauge lambda 函数（如 `c -> c.getMetrics().getFailureRate()`）被 JaCoCo 视为独立方法，仅注册 Gauge 不够，必须调用 `gauge.value()` 才能触发 lambda 执行
+- **解决**：在测试中对每个 Gauge 调用 `.value()` 读取值，确保所有 lambda 被执行
+
+#### 阶段六：CircuitBreaker.onSuccess() 需要 TimeUnit
+- **问题**：`cb.onSuccess(0, null)` 导致 NullPointerException，第二个参数 `durationUnit` 不能为 null
+- **解决**：改用 `cb.onSuccess(0, TimeUnit.MILLISECONDS)`
+
 ---
 
 ## 学习笔记
@@ -271,6 +313,14 @@
 - 完成 RateLimiterFactory 工厂模式（镜像 CircuitBreakerFactory）
 - RateLimiter 事件只有 onSuccess/onFailure（CircuitBreaker 有 4 种事件）
 - Service 从 Registry 迁移到 Factory，resolveRateLimiter 自动创建模式
+
+### 2026-02-10
+- Factory 管理的实例绕过 Registry，`TaggedCircuitBreakerMetrics.ofCircuitBreakerRegistry()` 无法监控它们
+- 解决方案：ResilienceMetricsRegistrar 手动为 Factory 实例注册 Gauge（双层指标绑定）
+- Micrometer Gauge 的 lambda 函数每次 Prometheus 抓取时被调用，实时返回最新值
+- JaCoCo 将 lambda 视为独立方法，必须实际调用 `gauge.value()` 才能覆盖
+- `MeterBinder` 接口是 Spring Boot 自动绑定 Micrometer 指标的标准方式
+- Counter/Timer 作为 Spring Bean 注入时，Bean 方法名即限定符名（无需 @Qualifier）
 
 ---
 
@@ -300,8 +350,16 @@
 - ✅ 新增高级示例和文档
 - ✅ 93 个测试全部通过，JaCoCo 100% 覆盖率
 
+### 2026-02-10
+- ✅ 阶段六完成（监控和指标体系）
+- ✅ 新增 MetricsConfig 配置类（TaggedMetrics + 自定义 Counter/Timer）
+- ✅ 新增 ResilienceMetricsRegistrar（Factory 实例 Gauge 注册）
+- ✅ 新增 MetricsController + MetricsSnapshot 模型
+- ✅ 新增 4 份监控文档（指标收集、Prometheus、Grafana、告警）
+- ✅ 108 个测试全部通过，JaCoCo 100% 覆盖率
+
 ---
 
-**最后更新时间**: 2026-02-09
+**最后更新时间**: 2026-02-10
 **更新人**: Claude
-**版本**: v1.5
+**版本**: v1.6
