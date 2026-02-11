@@ -2,6 +2,7 @@ package com.joker.resilience4j;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
@@ -19,6 +20,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @version 1.0.0
  */
 @SpringBootApplication
+@ConfigurationPropertiesScan
 public class Application {
 
     private static ConfigurableApplicationContext context;

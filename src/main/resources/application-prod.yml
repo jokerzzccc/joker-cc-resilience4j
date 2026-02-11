@@ -1,0 +1,20 @@
+app:
+  resilience:
+    circuit-breaker:
+      failure-rate-threshold: 30
+      slow-call-rate-threshold: 50
+      slow-call-duration-threshold-ms: 3000
+      sliding-window-size: 100
+      minimum-number-of-calls: 20
+      permitted-number-of-calls-in-half-open-state: 5
+      wait-duration-in-open-state-ms: 30000
+    rate-limiter:
+      limit-for-period: 50
+      limit-refresh-period-ms: 1000
+      timeout-duration-ms: 0
+
+logging:
+  level:
+    root: WARN
+    com.joker.resilience4j: INFO
+    io.github.resilience4j: INFO

@@ -12,15 +12,16 @@ import java.time.Duration;
 public class CustomCircuitBreakerConfig {
 
     @Bean
-    public CircuitBreakerConfig circuitBreakerConfig() {
+    public CircuitBreakerConfig circuitBreakerConfig(ResilienceConfigProperties properties) {
+        ResilienceConfigProperties.CircuitBreakerProps cb = properties.circuitBreaker();
         return CircuitBreakerConfig.custom()
-                .failureRateThreshold(50.0f)
-                .slowCallRateThreshold(50.0f)
-                .slowCallDurationThreshold(Duration.ofSeconds(2))
-                .slidingWindowSize(10)
-                .minimumNumberOfCalls(5)
-                .permittedNumberOfCallsInHalfOpenState(2)
-                .waitDurationInOpenState(Duration.ofSeconds(5))
+                .failureRateThreshold(cb.failureRateThreshold())
+                .slowCallRateThreshold(cb.slowCallRateThreshold())
+                .slowCallDurationThreshold(Duration.ofMillis(cb.slowCallDurationThresholdMs()))
+                .slidingWindowSize(cb.slidingWindowSize())
+                .minimumNumberOfCalls(cb.minimumNumberOfCalls())
+                .permittedNumberOfCallsInHalfOpenState(cb.permittedNumberOfCallsInHalfOpenState())
+                .waitDurationInOpenState(Duration.ofMillis(cb.waitDurationInOpenStateMs()))
                 .recordExceptions(Exception.class)
                 .build();
     }

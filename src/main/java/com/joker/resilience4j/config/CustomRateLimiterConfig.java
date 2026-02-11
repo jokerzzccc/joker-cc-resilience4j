@@ -12,11 +12,12 @@ import java.time.Duration;
 public class CustomRateLimiterConfig {
 
     @Bean
-    public RateLimiterConfig rateLimiterConfig() {
+    public RateLimiterConfig rateLimiterConfig(ResilienceConfigProperties properties) {
+        ResilienceConfigProperties.RateLimiterProps rl = properties.rateLimiter();
         return RateLimiterConfig.custom()
-                .limitForPeriod(10)
-                .limitRefreshPeriod(Duration.ofSeconds(1))
-                .timeoutDuration(Duration.ZERO)
+                .limitForPeriod(rl.limitForPeriod())
+                .limitRefreshPeriod(Duration.ofMillis(rl.limitRefreshPeriodMs()))
+                .timeoutDuration(Duration.ofMillis(rl.timeoutDurationMs()))
                 .build();
     }
 
