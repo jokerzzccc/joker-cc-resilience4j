@@ -16,6 +16,13 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+/**
+ * 限流器业务逻辑服务，通过 {@code transformDeferred(RateLimiterOperator.of(...))}
+ * 将外部调用纳入限流保护。
+ *
+ * <p>支持单限流器调用、带 fallback 调用、命名调用、双限流器组合调用，
+ * 以及限流器状态查询。所有方法返回 {@link Mono}，保持全链路响应式。</p>
+ */
 @Service
 public class RateLimiterService {
 

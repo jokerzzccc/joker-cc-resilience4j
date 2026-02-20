@@ -151,11 +151,46 @@ class ProductionServiceTest {
                 .assertNext(response -> assertThat(response.success()).isTrue())
                 .verifyComplete();
 
-        // Second call should be rate limited -> static fallback (cache is set)
+        // Second call should be rate limited -> cached fallback (cache is set from first call)
         StepVerifier.create(strictService.callWithFullProtection("success", 0))
                 .assertNext(response -> {
                     assertThat(response.success()).isTrue();
                     assertThat(response.data()).startsWith("cached:");
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnStaticFallbackWhenRateLimitedAndNoCache() {
+        // Rate limiter with zero permits available immediately
+        RateLimiterFactory strictRlFactory = new RateLimiterFactory(
+                RateLimiterConfig.custom()
+                        .limitForPeriod(1)
+                        .limitRefreshPeriod(Duration.ofSeconds(10))
+                        .timeoutDuration(Duration.ZERO)
+                        .build()
+        );
+        strictRlFactory.create("externalApi", RateLimiterFactory.ConfigTemplate.BURST);
+        CircuitBreakerFactory strictCbFactory = new CircuitBreakerFactory(CircuitBreakerConfig.ofDefaults());
+        strictCbFactory.create("externalApi", CircuitBreakerFactory.ConfigTemplate.HYBRID);
+        ProductionService strictService = new ProductionService(
+                strictCbFactory, strictRlFactory, new ExternalApiService());
+
+        // First call uses the one permit
+        StepVerifier.create(strictService.callWithFullProtection("success", 0))
+                .expectNextCount(1)
+                .verifyComplete();
+
+        // Clear cache so no cached fallback is available
+        StepVerifier.create(strictService.clearCache())
+                .expectNextCount(1)
+                .verifyComplete();
+
+        // Second call is rate limited with no cache -> static fallback via RequestNotPermitted branch
+        StepVerifier.create(strictService.callWithFullProtection("success", 0))
+                .assertNext(response -> {
+                    assertThat(response.success()).isTrue();
+                    assertThat(response.data()).isEqualTo("static-fallback");
                 })
                 .verifyComplete();
     }

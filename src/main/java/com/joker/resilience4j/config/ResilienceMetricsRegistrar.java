@@ -5,6 +5,13 @@ import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 
+/**
+ * 为 Factory 管理的 Resilience4j 实例手动注册 Micrometer Gauge。
+ *
+ * <p>由于 Factory 创建的实例绕过 Registry，{@code TaggedCircuitBreakerMetrics} 等
+ * 自动绑定机制无法监控它们。此类为每个实例注册 6 个 CircuitBreaker Gauge
+ * 和 2 个 RateLimiter Gauge，确保 Prometheus 可以抓取到完整指标。</p>
+ */
 public class ResilienceMetricsRegistrar {
 
     private final MeterRegistry meterRegistry;

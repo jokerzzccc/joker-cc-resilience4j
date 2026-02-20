@@ -13,8 +13,23 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 限流器工厂，统一管理 {@link RateLimiter} 实例的创建、缓存和动态更新。
+ *
+ * <p>提供三种预定义配置模板（{@link ConfigTemplate}），也支持自定义配置和
+ * {@link Consumer} 风格的构建器。所有实例通过 {@code ConcurrentHashMap} 缓存，
+ * 同名实例仅创建一次，并自动附加事件监听器记录许可授予和拒绝事件。</p>
+ */
 public class RateLimiterFactory {
 
+    /**
+     * 预定义配置模板。
+     * <ul>
+     *   <li>{@code STRICT} — 严格限流（5 次/秒，不等待）</li>
+     *   <li>{@code LENIENT} — 宽松限流（100 次/秒，等待 500ms）</li>
+     *   <li>{@code BURST} — 使用构造时传入的 baseConfig</li>
+     * </ul>
+     */
     public enum ConfigTemplate {
         STRICT,
         LENIENT,

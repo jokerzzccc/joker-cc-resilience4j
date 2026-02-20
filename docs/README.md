@@ -27,6 +27,8 @@ docs/
 │   ├── 02-prometheus.md               # Prometheus 集成
 │   ├── 03-grafana.md                  # Grafana 可视化
 │   └── 04-alerting.md                 # 告警配置
+├── api-reference.md                    # REST API 参考文档
+├── learning-summary.md                 # 学习总结报告
 └── README.md                           # 本文件
 ```
 
@@ -95,7 +97,7 @@ FAQ 形式的问题解答
 | 阶段五 | `ratelimiter/03-reactor-integration.md`<br>`ratelimiter/04-advanced-patterns.md` | RateLimiter + Reactor 集成完成后 |
 | 阶段六 | `monitoring/01-metrics.md`<br>`monitoring/02-prometheus.md`<br>`monitoring/03-grafana.md`<br>`monitoring/04-alerting.md` | 监控体系建立完成后 |
 | 阶段七 | `production/01-configuration-tuning.md`<br>`production/02-error-handling.md`<br>`production/03-fallback-patterns.md`<br>`production/04-performance.md`<br>`production/05-troubleshooting.md` | 生产实践完成后 |
-| 阶段八 | 完善所有文档 | 项目收尾阶段 |
+| 阶段八 | `api-reference.md`<br>`learning-summary.md`<br>完善所有文档 | 项目收尾阶段 |
 
 ## 文档审核标准
 
@@ -117,4 +119,5 @@ FAQ 形式的问题解答
 ---
 
 **创建日期**: 2026-01-31
+**最后更新**: 2026-02-20
 **维护人**: Claude + User

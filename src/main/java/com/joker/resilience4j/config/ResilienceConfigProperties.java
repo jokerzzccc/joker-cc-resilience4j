@@ -3,6 +3,12 @@ package com.joker.resilience4j.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
+/**
+ * 外部化配置属性，绑定 {@code app.resilience} 前缀。
+ *
+ * <p>包含 {@link CircuitBreakerProps} 和 {@link RateLimiterProps} 两个嵌套 record，
+ * 所有参数均通过 {@link DefaultValue} 提供默认值，无需 YAML 即可启动。</p>
+ */
 @ConfigurationProperties(prefix = "app.resilience")
 public record ResilienceConfigProperties(
         @DefaultValue CircuitBreakerProps circuitBreaker,

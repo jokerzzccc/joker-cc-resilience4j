@@ -20,6 +20,12 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+/**
+ * 生产级服务示例，演示 CircuitBreaker + RateLimiter 组合保护和多级降级。
+ *
+ * <p>降级策略：缓存命中 → 静态兜底（CB/RL 异常）→ 错误响应（其他异常）。
+ * RateLimiter 置于 CircuitBreaker 之前，限流拒绝不计入熔断窗口。</p>
+ */
 @Service
 public class ProductionService {
 

@@ -13,6 +13,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import reactor.core.publisher.Mono;
 
+/**
+ * 全局异常处理器，将 Resilience4j 异常映射为标准 HTTP 状态码。
+ *
+ * <ul>
+ *   <li>{@link CallNotPermittedException} → 503 Service Unavailable</li>
+ *   <li>{@link RequestNotPermitted} → 429 Too Many Requests</li>
+ *   <li>其他异常 → 500 Internal Server Error</li>
+ * </ul>
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 

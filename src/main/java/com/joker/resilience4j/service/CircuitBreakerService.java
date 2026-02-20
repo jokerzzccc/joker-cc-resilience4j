@@ -17,6 +17,13 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+/**
+ * 熔断器业务逻辑服务，通过 {@code transformDeferred(CircuitBreakerOperator.of(...))}
+ * 将外部调用纳入熔断保护。
+ *
+ * <p>支持单熔断器调用、带 fallback 调用、命名调用、双熔断器组合调用，
+ * 以及熔断器状态查询。所有方法返回 {@link Mono}，保持全链路响应式。</p>
+ */
 @Service
 public class CircuitBreakerService {
 

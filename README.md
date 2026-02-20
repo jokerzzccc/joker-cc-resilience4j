@@ -46,16 +46,31 @@ mvn spring-boot:run
 ```bash
 # CircuitBreaker 测试
 curl http://localhost:8080/api/circuit-breaker/test
+curl http://localhost:8080/api/circuit-breaker/test-fallback?mode=failure
+curl http://localhost:8080/api/circuit-breaker/state
 
 # RateLimiter 测试
 curl http://localhost:8080/api/rate-limiter/test
+curl http://localhost:8080/api/rate-limiter/test-fallback?mode=failure
+curl http://localhost:8080/api/rate-limiter/state
 
-# 健康检查
+# 生产模式（CB + RL 组合保护 + 多级降级）
+curl http://localhost:8080/api/production/test
+curl http://localhost:8080/api/production/cache
+
+# 动态配置更新
+curl -X POST "http://localhost:8080/api/config/circuit-breaker/externalApi?failureRateThreshold=30"
+curl http://localhost:8080/api/config/circuit-breaker/externalApi
+
+# 指标快照
+curl http://localhost:8080/api/metrics/snapshot
+
+# Actuator
 curl http://localhost:8080/actuator/health
-
-# Prometheus 指标
 curl http://localhost:8080/actuator/prometheus
 ```
+
+完整 API 参考见 [docs/api-reference.md](docs/api-reference.md)。
 
 ## 项目结构
 
@@ -66,16 +81,23 @@ curl http://localhost:8080/actuator/prometheus
 │   ├── implementation_progress.md      # 实时进度跟踪
 │   └── architecture.md                 # 技术架构设计
 ├── src/main/java/com/joker/resilience4j/
-│   ├── config/                         # 编程式配置
-│   ├── controller/                     # REST 接口
-│   ├── service/                        # 业务逻辑
-│   └── model/                          # 数据模型
-├── docs/                               # 教学文档
-│   ├── circuitbreaker/                 # 熔断器文档
-│   ├── ratelimiter/                    # 限流器文档
-│   ├── production/                     # 生产实践文档
-│   └── monitoring/                     # 监控文档
-├── examples/                           # 示例代码
+│   ├── config/                         # 编程式配置（Factory、Properties、Metrics）
+│   ├── controller/                     # REST 接口（5 个 Controller）
+│   ├── service/                        # 业务逻辑（CB/RL/Production Service）
+│   └── model/                          # 数据模型（record）
+├── src/test/java/com/joker/resilience4j/
+│   ├── config/                         # 配置层测试
+│   ├── controller/                     # Controller 层测试
+│   ├── service/                        # Service 层测试
+│   ├── model/                          # Model 层测试
+│   └── examples/                       # 可运行示例代码
+├── docs/                               # 教学文档（20 份）
+│   ├── circuitbreaker/                 # 熔断器文档（4 份）
+│   ├── ratelimiter/                    # 限流器文档（4 份）
+│   ├── production/                     # 生产实践文档（5 份）
+│   ├── monitoring/                     # 监控文档（4 份）
+│   ├── api-reference.md               # REST API 参考
+│   └── learning-summary.md            # 学习总结报告
 └── pom.xml
 ```
 
@@ -148,12 +170,14 @@ public Mono<Response> callWithRateLimiter() {
 
 各阶段完成后生成的教学文档，面向 5 年以上 Java 开发者：
 
-| 目录 | 内容 | 生成阶段 |
+| 目录/文件 | 内容 | 生成阶段 |
 |------|------|----------|
 | `circuitbreaker/` | 熔断器基础、配置、Reactor 集成、高级模式 | 阶段 2-3 |
 | `ratelimiter/` | 限流器基础、配置、Reactor 集成、高级模式 | 阶段 4-5 |
-| `production/` | 配置调优、错误处理、降级、性能、故障排查 | 阶段 7 |
 | `monitoring/` | 指标、Prometheus、Grafana、告警 | 阶段 6 |
+| `production/` | 配置调优、错误处理、降级、性能、故障排查 | 阶段 7 |
+| `api-reference.md` | 全部 REST 端点参考 | 阶段 8 |
+| `learning-summary.md` | 学习总结报告 | 阶段 8 |
 
 ## 参考资料
 
@@ -166,7 +190,15 @@ public Mono<Response> callWithRateLimiter() {
 
 本项目仅用于学习目的。
 
+## 项目状态
+
+- **完成度**: 100%（8/8 阶段完成）
+- **测试**: 133 个测试全部通过
+- **覆盖率**: JaCoCo LINE + BRANCH 100%
+- **源文件**: 25 个 Java 源文件，31 个测试文件，8 个示例文件
+- **文档**: 20 份教学文档
+
 ---
 
-**版本**: v1.0
-**最后更新**: 2026-02-01
+**版本**: v2.0
+**最后更新**: 2026-02-20

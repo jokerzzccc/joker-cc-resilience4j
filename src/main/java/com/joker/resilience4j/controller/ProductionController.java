@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/**
+ * 生产模式端点，演示 CB+RL 组合保护、多级降级和缓存管理。
+ */
 @RestController
 @RequestMapping("/api/production")
 public class ProductionController {

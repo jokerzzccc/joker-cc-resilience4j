@@ -13,8 +13,23 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 熔断器工厂，统一管理 {@link CircuitBreaker} 实例的创建、缓存和动态更新。
+ *
+ * <p>提供三种预定义配置模板（{@link ConfigTemplate}），也支持自定义配置和
+ * {@link Consumer} 风格的构建器。所有实例通过 {@code ConcurrentHashMap} 缓存，
+ * 同名实例仅创建一次，并自动附加事件监听器记录状态转换和限流事件。</p>
+ */
 public class CircuitBreakerFactory {
 
+    /**
+     * 预定义配置模板。
+     * <ul>
+     *   <li>{@code FAST_FAIL} — 低阈值快速熔断（failureRate=25%, window=4）</li>
+     *   <li>{@code SLOW_CALL} — 慢调用检测模式（slowCallRate=50%, threshold=400ms）</li>
+     *   <li>{@code HYBRID} — 使用构造时传入的 baseConfig</li>
+     * </ul>
+     */
     public enum ConfigTemplate {
         FAST_FAIL,
         SLOW_CALL,

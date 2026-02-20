@@ -13,6 +13,13 @@ import io.micrometer.core.instrument.binder.MeterBinder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * 监控指标配置，注册 Resilience4j 和自定义 Micrometer 指标。
+ *
+ * <p>包含 6 个 Bean：Registry 级别的 CircuitBreaker/RateLimiter 指标绑定、
+ * 自定义 Counter（CB 调用计数、RL 调用计数）、Timer（API 调用耗时），
+ * 以及 {@link ResilienceMetricsRegistrar}（为 Factory 管理的实例注册 Gauge）。</p>
+ */
 @Configuration
 public class MetricsConfig {
 

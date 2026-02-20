@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/**
+ * 动态配置管理端点，支持运行时更新 CircuitBreaker 和 RateLimiter 的配置参数。
+ * 更新操作通过 Factory.update() 创建新实例替换缓存中的旧实例。
+ */
 @RestController
 @RequestMapping("/api/config")
 public class ConfigController {

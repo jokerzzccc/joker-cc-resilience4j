@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/**
+ * 限流器测试端点，提供单实例/组合调用、fallback 降级和状态查询接口。
+ */
 @RestController
 @RequestMapping("/api/rate-limiter")
 public class RateLimiterController {

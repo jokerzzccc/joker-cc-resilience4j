@@ -11,6 +11,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 指标快照端点，聚合展示自定义 Counter 和 Timer 的当前值。
+ */
 @RestController
 @RequestMapping("/api/metrics")
 public class MetricsController {
