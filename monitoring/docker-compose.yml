@@ -1,0 +1,62 @@
+# 监控组件一键部署 - 在 joker01 服务器上执行
+# 注意：本项目禁止直接执行 Docker 命令，此文件仅作部署参考
+#
+# 使用方法：
+#   1. 将整个 monitoring/ 目录复制到 joker01 服务器
+#   2. 修改 prometheus.yml 中 <APP_PUBLIC_IP> 为实际 IP
+#   3. 在 monitoring/ 目录下执行: docker compose up -d
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    restart: unless-stopped
+
+  # Pushgateway — 接收应用主动推送的指标
+  # 应用通过 POST /metrics/job/<job>/instance/<instance> 推送
+  # Prometheus 再从 Pushgateway pull 这些指标
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: pushgateway
+    ports:
+      - "9092:9091"
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  grafana-data:

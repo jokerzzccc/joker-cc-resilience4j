@@ -31,6 +31,14 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
+# Pushgateway configuration (disabled by default, enable with pushgateway profile)
+app:
+  pushgateway:
+    enabled: false
+    url: http://localhost:9091
+    job-name: resilience4j-learning
+    push-interval-seconds: 15
+
 # Note: We are NOT using resilience4j.* configuration properties
 # All Resilience4j configuration is done programmatically in Java code
 # This demonstrates the pure resilience4j-reactor approach

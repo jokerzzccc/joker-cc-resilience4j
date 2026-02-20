@@ -1,0 +1,174 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "resilience4j-monitoring",
+    "title": "Resilience4j Monitoring",
+    "tags": ["resilience4j"],
+    "timezone": "browser",
+    "refresh": "5s",
+    "schemaVersion": 39,
+    "templating": {
+      "list": [
+        {
+          "name": "instance",
+          "type": "query",
+          "query": "label_values(resilience4j_circuitbreaker_state, name)",
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "refresh": 2,
+          "includeAll": true,
+          "multi": true,
+          "current": { "selected": true, "text": "All", "value": "$__all" }
+        }
+      ]
+    },
+    "panels": [
+      {
+        "title": "CircuitBreaker State",
+        "type": "state-timeline",
+        "gridPos": { "h": 6, "w": 12, "x": 0, "y": 0 },
+        "datasource": { "type": "prometheus" },
+        "targets": [
+          {
+            "expr": "resilience4j_circuitbreaker_state{name=~\"$instance\"}",
+            "legendFormat": "{{name}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              { "type": "value", "options": { "0": { "text": "CLOSED", "color": "green" } } },
+              { "type": "value", "options": { "1": { "text": "OPEN", "color": "red" } } },
+              { "type": "value", "options": { "2": { "text": "HALF_OPEN", "color": "yellow" } } }
+            ]
+          }
+        }
+      },
+      {
+        "title": "Failure Rate (%)",
+        "type": "gauge",
+        "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+        "datasource": { "type": "prometheus" },
+        "targets": [
+          {
+            "expr": "resilience4j_circuitbreaker_failure_rate{name=~\"$instance\"}",
+            "legendFormat": "{{name}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 30, "color": "yellow" },
+                { "value": 50, "color": "red" }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "Slow Call Rate (%)",
+        "type": "gauge",
+        "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+        "datasource": { "type": "prometheus" },
+        "targets": [
+          {
+            "expr": "resilience4j_circuitbreaker_slow_call_rate{name=~\"$instance\"}",
+            "legendFormat": "{{name}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 20, "color": "yellow" },
+                { "value": 50, "color": "red" }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "Buffered / Failed Calls",
+        "type": "timeseries",
+        "gridPos": { "h": 6, "w": 12, "x": 0, "y": 6 },
+        "datasource": { "type": "prometheus" },
+        "targets": [
+          {
+            "expr": "resilience4j_circuitbreaker_buffered_calls{name=~\"$instance\"}",
+            "legendFormat": "{{name}} buffered"
+          },
+          {
+            "expr": "resilience4j_circuitbreaker_failed_calls{name=~\"$instance\"}",
+            "legendFormat": "{{name}} failed"
+          }
+        ]
+      },
+      {
+        "title": "RateLimiter Available Permissions",
+        "type": "timeseries",
+        "gridPos": { "h": 6, "w": 12, "x": 12, "y": 6 },
+        "datasource": { "type": "prometheus" },
+        "targets": [
+          {
+            "expr": "resilience4j_ratelimiter_available_permissions{name=~\"$instance\"}",
+            "legendFormat": "{{name}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "red" },
+                { "value": 2, "color": "yellow" },
+                { "value": 5, "color": "green" }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "RateLimiter Waiting Threads",
+        "type": "timeseries",
+        "gridPos": { "h": 6, "w": 12, "x": 0, "y": 12 },
+        "datasource": { "type": "prometheus" },
+        "targets": [
+          {
+            "expr": "resilience4j_ratelimiter_waiting_threads{name=~\"$instance\"}",
+            "legendFormat": "{{name}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 5, "color": "yellow" },
+                { "value": 10, "color": "red" }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "Not Permitted Calls",
+        "type": "timeseries",
+        "gridPos": { "h": 6, "w": 12, "x": 12, "y": 12 },
+        "datasource": { "type": "prometheus" },
+        "targets": [
+          {
+            "expr": "resilience4j_circuitbreaker_not_permitted_calls{name=~\"$instance\"}",
+            "legendFormat": "{{name}} not_permitted"
+          }
+        ]
+      }
+    ]
+  }
+}

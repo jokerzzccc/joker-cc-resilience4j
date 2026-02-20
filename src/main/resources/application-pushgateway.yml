@@ -1,0 +1,8 @@
+# Pushgateway profile — 启用指标推送
+# 启动方式：mvn spring-boot:run -Dspring-boot.run.profiles=pushgateway
+# 使用前请将 <PUSHGATEWAY_HOST> 替换为 Pushgateway 的实际地址
+app:
+  pushgateway:
+    enabled: true
+    url: http://<PUSHGATEWAY_HOST>:9092
+    push-interval-seconds: 15

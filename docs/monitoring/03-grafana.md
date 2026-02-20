@@ -1,22 +1,56 @@
 # Grafana 可视化
 
-## 1. 启动 Grafana（仅供参考）
+## 1. 部署方式
 
-```bash
-# 注意：本项目禁止执行 Docker 命令，以下仅作文档示例
-docker run -d \
-  --name grafana \
-  -p 3000:3000 \
-  grafana/grafana
+Grafana 部署在 **joker01** 服务器上，通过 Docker Compose 与 Prometheus 一起启动。
+
+完整部署配置见 [`monitoring/docker-compose.yml`](../../monitoring/docker-compose.yml)。
+
+访问地址：`http://joker01:3000`，默认账号 `admin/admin`。
+
+### 自动配置（Provisioning）
+
+项目提供了 Grafana Provisioning 配置，启动后自动完成数据源和 Dashboard 加载，无需手动配置：
+
+```
+monitoring/grafana/
+├── provisioning/
+│   ├── datasources/prometheus.yml    # 自动配置 Prometheus 数据源
+│   └── dashboards/dashboard.yml      # 自动加载 Dashboard 文件
+└── dashboards/
+    └── resilience4j.json             # Resilience4j 监控面板
 ```
 
-默认账号：`admin/admin`，访问：`http://localhost:3000`
+**数据源配置** [`monitoring/grafana/provisioning/datasources/prometheus.yml`](../../monitoring/grafana/provisioning/datasources/prometheus.yml)：
 
-添加数据源：Configuration → Data Sources → Add → Prometheus → URL: `http://localhost:9090`
+```yaml
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090    # Docker 内部网络，Grafana 通过服务名访问 Prometheus
+    isDefault: true
+```
+
+> `http://prometheus:9090` 是 Docker Compose 内部网络地址，Grafana 和 Prometheus 在同一 Docker 网络中，通过服务名直接通信。
+
+**Dashboard 自动加载** [`monitoring/grafana/provisioning/dashboards/dashboard.yml`](../../monitoring/grafana/provisioning/dashboards/dashboard.yml)：
+
+```yaml
+apiVersion: 1
+providers:
+  - name: 'Resilience4j'
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards    # 容器内路径，由 docker-compose 挂载
+```
 
 ---
 
 ## 2. Dashboard 面板配置
+
+完整 Dashboard JSON 见 [`monitoring/grafana/dashboards/resilience4j.json`](../../monitoring/grafana/dashboards/resilience4j.json)，包含以下 7 个面板：
 
 ### Panel 1: CircuitBreaker 状态时间线
 
@@ -35,37 +69,44 @@ docker run -d \
 | 阈值 | 0-30 绿，30-50 黄，50-100 红 |
 | 单位 | Percent (0-100) |
 
-### Panel 3: 调用速率
-
-| 配置项 | 值 |
-|--------|-----|
-| 可视化 | Time Series |
-| PromQL (成功) | `rate(resilience4j_circuitbreaker_buffered_calls{name=~"$instance"}[1m])` |
-| PromQL (失败) | `rate(resilience4j_circuitbreaker_failed_calls{name=~"$instance"}[1m])` |
-
-### Panel 4: RateLimiter 可用许可
-
-| 配置项 | 值 |
-|--------|-----|
-| 可视化 | Time Series |
-| PromQL | `resilience4j_ratelimiter_available_permissions{name=~"$instance"}` |
-| 阈值 | 低于 2 时红色填充 |
-
-### Panel 5: RateLimiter 等待线程
-
-| 配置项 | 值 |
-|--------|-----|
-| 可视化 | Time Series |
-| PromQL | `resilience4j_ratelimiter_waiting_threads{name=~"$instance"}` |
-| 阈值 | 大于 5 时黄色，大于 10 时红色 |
-
-### Panel 6: 慢调用率
+### Panel 3: 慢调用率仪表盘
 
 | 配置项 | 值 |
 |--------|-----|
 | 可视化 | Gauge |
 | PromQL | `resilience4j_circuitbreaker_slow_call_rate{name=~"$instance"}` |
 | 阈值 | 0-20 绿，20-50 黄，50-100 红 |
+
+### Panel 4: 缓冲/失败调用趋势
+
+| 配置项 | 值 |
+|--------|-----|
+| 可视化 | Time Series |
+| PromQL (缓冲) | `resilience4j_circuitbreaker_buffered_calls{name=~"$instance"}` |
+| PromQL (失败) | `resilience4j_circuitbreaker_failed_calls{name=~"$instance"}` |
+
+### Panel 5: RateLimiter 可用许可
+
+| 配置项 | 值 |
+|--------|-----|
+| 可视化 | Time Series |
+| PromQL | `resilience4j_ratelimiter_available_permissions{name=~"$instance"}` |
+| 阈值 | 0 红，2 黄，5 绿 |
+
+### Panel 6: RateLimiter 等待线程
+
+| 配置项 | 值 |
+|--------|-----|
+| 可视化 | Time Series |
+| PromQL | `resilience4j_ratelimiter_waiting_threads{name=~"$instance"}` |
+| 阈值 | 0 绿，5 黄，10 红 |
+
+### Panel 7: 不被允许的调用
+
+| 配置项 | 值 |
+|--------|-----|
+| 可视化 | Time Series |
+| PromQL | `resilience4j_circuitbreaker_not_permitted_calls{name=~"$instance"}` |
 
 ---
 
@@ -81,100 +122,14 @@ docker run -d \
 
 ---
 
-## 4. Dashboard JSON 模板
+## 4. 手动导入 Dashboard
 
-以下 JSON 可直接导入 Grafana（Dashboards → Import → Paste JSON）：
+如果不使用 Provisioning 自动加载，也可以手动导入：
 
-```json
-{
-  "dashboard": {
-    "title": "Resilience4j Monitoring",
-    "tags": ["resilience4j"],
-    "timezone": "browser",
-    "refresh": "5s",
-    "templating": {
-      "list": [
-        {
-          "name": "instance",
-          "type": "query",
-          "query": "label_values(resilience4j_circuitbreaker_state, name)",
-          "datasource": "Prometheus",
-          "refresh": 2
-        }
-      ]
-    },
-    "panels": [
-      {
-        "title": "CircuitBreaker State",
-        "type": "state-timeline",
-        "gridPos": { "h": 6, "w": 12, "x": 0, "y": 0 },
-        "targets": [
-          {
-            "expr": "resilience4j_circuitbreaker_state{name=~\"$instance\"}",
-            "legendFormat": "{{name}}"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "mappings": [
-              { "type": "value", "options": { "0": { "text": "CLOSED", "color": "green" } } },
-              { "type": "value", "options": { "1": { "text": "OPEN", "color": "red" } } },
-              { "type": "value", "options": { "2": { "text": "HALF_OPEN", "color": "yellow" } } }
-            ]
-          }
-        }
-      },
-      {
-        "title": "Failure Rate",
-        "type": "gauge",
-        "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
-        "targets": [
-          {
-            "expr": "resilience4j_circuitbreaker_failure_rate{name=~\"$instance\"}",
-            "legendFormat": "{{name}}"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "percent",
-            "min": 0,
-            "max": 100,
-            "thresholds": {
-              "steps": [
-                { "value": 0, "color": "green" },
-                { "value": 30, "color": "yellow" },
-                { "value": 50, "color": "red" }
-              ]
-            }
-          }
-        }
-      },
-      {
-        "title": "RateLimiter Available Permissions",
-        "type": "timeseries",
-        "gridPos": { "h": 6, "w": 12, "x": 0, "y": 6 },
-        "targets": [
-          {
-            "expr": "resilience4j_ratelimiter_available_permissions{name=~\"$instance\"}",
-            "legendFormat": "{{name}}"
-          }
-        ]
-      },
-      {
-        "title": "Waiting Threads",
-        "type": "timeseries",
-        "gridPos": { "h": 6, "w": 6, "x": 12, "y": 6 },
-        "targets": [
-          {
-            "expr": "resilience4j_ratelimiter_waiting_threads{name=~\"$instance\"}",
-            "legendFormat": "{{name}}"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+1. 访问 `http://joker01:3000`
+2. Dashboards → Import → Upload JSON file
+3. 选择 [`monitoring/grafana/dashboards/resilience4j.json`](../../monitoring/grafana/dashboards/resilience4j.json)
+4. 选择 Prometheus 数据源 → Import
 
 ---
 
@@ -183,4 +138,5 @@ docker run -d \
 - **刷新间隔**：Dashboard 刷新设为 5-10s，与 Prometheus scrape interval 匹配
 - **阈值着色**：失败率、慢调用率使用红黄绿三色阈值，直观标识健康状态
 - **变量筛选**：使用 Dashboard 变量按实例名过滤，避免一个面板显示过多曲线
-- **告警集成**：Grafana 告警可直接基于 Panel 查询配置，但建议使用 Prometheus Alertmanager（见 04-alerting.md）
+- **告警集成**：建议使用 Prometheus Alertmanager 而非 Grafana 内置告警（见 [04-alerting.md](04-alerting.md)）
+- **Provisioning 优先**：使用 provisioning 配置自动加载数据源和 Dashboard，避免手动配置丢失

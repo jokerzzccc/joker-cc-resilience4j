@@ -26,7 +26,8 @@ docs/
 │   ├── 01-metrics.md                  # 指标收集
 │   ├── 02-prometheus.md               # Prometheus 集成
 │   ├── 03-grafana.md                  # Grafana 可视化
-│   └── 04-alerting.md                 # 告警配置
+│   ├── 04-alerting.md                 # 告警配置
+│   └── 05-pushgateway.md             # Pushgateway 集成
 ├── api-reference.md                    # REST API 参考文档
 ├── learning-summary.md                 # 学习总结报告
 └── README.md                           # 本文件
@@ -119,5 +120,5 @@ FAQ 形式的问题解答
 ---
 
 **创建日期**: 2026-01-31
-**最后更新**: 2026-02-20
+**最后更新**: 2026-02-21
 **维护人**: Claude + User

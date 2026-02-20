@@ -2,7 +2,16 @@
 
 ## 1. Prometheus 告警规则
 
-### alerts.yml
+告警规则配置文件：[`monitoring/alerts.yml`](../../monitoring/alerts.yml)
+
+Prometheus 通过 `rule_files` 引用告警规则文件，在 [`monitoring/prometheus.yml`](../../monitoring/prometheus.yml) 中已配置：
+
+```yaml
+rule_files:
+  - "alerts.yml"
+```
+
+### 规则内容
 
 ```yaml
 groups:
@@ -56,23 +65,24 @@ groups:
           description: "RateLimiter {{ $labels.name }} has {{ $value }} waiting threads"
 ```
 
-在 `prometheus.yml` 中引用：
-
-```yaml
-rule_files:
-  - "alerts.yml"
-```
-
 ---
 
 ## 2. Alertmanager 配置
 
-### alertmanager.yml
+Alertmanager 配置文件：[`monitoring/alertmanager.yml`](../../monitoring/alertmanager.yml)
+
+Alertmanager 部署在 joker01 服务器上，通过 Docker Compose 与 Prometheus 一起启动。Prometheus 在 [`monitoring/prometheus.yml`](../../monitoring/prometheus.yml) 中已配置 Alertmanager 地址：
 
 ```yaml
-global:
-  resolve_timeout: 5m
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']    # Docker 内部网络
+```
 
+### 路由规则
+
+```yaml
 route:
   group_by: ['alertname', 'severity']
   group_wait: 10s
@@ -90,31 +100,11 @@ route:
         severity: warning
       receiver: 'warning-alerts'
       repeat_interval: 30m
-
-receivers:
-  - name: 'default'
-    webhook_configs:
-      - url: 'http://localhost:9093/webhook'
-
-  - name: 'critical-alerts'
-    webhook_configs:
-      - url: 'http://localhost:9093/webhook/critical'
-
-  - name: 'warning-alerts'
-    webhook_configs:
-      - url: 'http://localhost:9093/webhook/warning'
 ```
 
-### Docker 启动（仅供参考）
+> 完整配置包含 3 个 receiver（default、critical-alerts、warning-alerts），使用 webhook 接收告警。部署时可替换为实际的通知渠道（钉钉、飞书、PagerDuty 等）。
 
-```bash
-# 注意：本项目禁止执行 Docker 命令
-docker run -d \
-  --name alertmanager \
-  -p 9093:9093 \
-  -v ./alertmanager.yml:/etc/alertmanager/alertmanager.yml \
-  prom/alertmanager
-```
+访问 Alertmanager：`http://joker01:9093`
 
 ---
 
@@ -140,7 +130,28 @@ docker run -d \
 
 ---
 
-## 5. 最佳实践
+## 5. 部署与验证
+
+告警组件通过 [`monitoring/docker-compose.yml`](../../monitoring/docker-compose.yml) 一键部署到 joker01。
+
+### 验证步骤
+
+1. 访问 `http://joker01:9090/alerts` 查看 Prometheus 告警规则是否加载
+2. 访问 `http://joker01:9093` 查看 Alertmanager 是否正常运行
+3. 触发测试告警：让熔断器进入 OPEN 状态，观察告警是否触发
+
+### 配置热重载
+
+修改 `alerts.yml` 后无需重启 Prometheus：
+
+```bash
+# 在 joker01 上执行
+curl -X POST http://joker01:9090/-/reload
+```
+
+---
+
+## 6. 最佳实践
 
 ### 防告警疲劳
 

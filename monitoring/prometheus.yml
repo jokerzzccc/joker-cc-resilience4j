@@ -1,0 +1,47 @@
+# Prometheus 配置 - 部署到 joker01 服务器
+# 使用前请将 <APP_PUBLIC_IP> 替换为运行 Spring Boot 应用的机器公网 IP
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alerts.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+scrape_configs:
+  # Prometheus 自身监控
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Resilience4j 学习项目
+  - job_name: 'resilience4j-learning'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['<APP_PUBLIC_IP>:8080']
+        labels:
+          application: 'resilience4j-reactor-learning'
+          environment: 'dev'
+
+  # Pushgateway（接收应用主动推送的指标）
+  # honor_labels: true 确保推送时携带的 job/instance 标签不被 Prometheus 覆盖
+  - job_name: 'pushgateway'
+    honor_labels: true
+    static_configs:
+      - targets: ['pushgateway:9091']
+
+  # 生产环境（Actuator 独立端口）
+  # - job_name: 'resilience4j-learning-prod'
+  #   metrics_path: '/actuator/prometheus'
+  #   scrape_interval: 15s
+  #   static_configs:
+  #     - targets: ['<APP_PUBLIC_IP>:9091']
+  #       labels:
+  #         application: 'resilience4j-reactor-learning'
+  #         environment: 'prod'

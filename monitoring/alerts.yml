@@ -1,0 +1,51 @@
+# Resilience4j 告警规则 - 部署到 joker01 服务器
+
+groups:
+  - name: resilience4j-circuitbreaker
+    rules:
+      - alert: CircuitBreakerOpen
+        expr: resilience4j_circuitbreaker_state != 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CircuitBreaker {{ $labels.name }} is not CLOSED"
+          description: "CircuitBreaker {{ $labels.name }} has been in non-CLOSED state for more than 1 minute. Current state value: {{ $value }}"
+
+      - alert: HighFailureRate
+        expr: resilience4j_circuitbreaker_failure_rate > 50
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High failure rate on {{ $labels.name }}"
+          description: "CircuitBreaker {{ $labels.name }} failure rate is {{ $value }}%, exceeding 50% threshold for 2 minutes"
+
+      - alert: HighSlowCallRate
+        expr: resilience4j_circuitbreaker_slow_call_rate > 50
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High slow call rate on {{ $labels.name }}"
+          description: "CircuitBreaker {{ $labels.name }} slow call rate is {{ $value }}%"
+
+  - name: resilience4j-ratelimiter
+    rules:
+      - alert: RateLimiterExhausted
+        expr: resilience4j_ratelimiter_available_permissions == 0
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: "RateLimiter {{ $labels.name }} exhausted"
+          description: "RateLimiter {{ $labels.name }} has 0 available permissions for 30 seconds"
+
+      - alert: HighWaitingThreads
+        expr: resilience4j_ratelimiter_waiting_threads > 10
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High waiting threads on {{ $labels.name }}"
+          description: "RateLimiter {{ $labels.name }} has {{ $value }} waiting threads"
